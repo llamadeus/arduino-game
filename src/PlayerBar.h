@@ -3,7 +3,7 @@
 
 const int BAR_WIDTH = 2;
 const int BAR_HEIGHT = 12;
-const int BAR_SPEED = 40;
+const int BAR_SPEED = 50;
 
 class PlayerBar : public GameObject {
    protected:

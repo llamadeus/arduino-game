@@ -1,9 +1,15 @@
 #pragma once
 #include "GameObject.h"
 
+const float ENTRY_ANGLE_FACTOR = 0.4;
+const float BAR_MANIPULATOR = 1 - ENTRY_ANGLE_FACTOR;
+const float BAR_MANIPULATOR_MAX_ANGLE = 70;
+
 class Ball : public GameObject {
    private:
-    float _vx = 40;
+    float _velociRAPTOR = 40;
+
+    float _vx = 1;
     float _vy = 0;
 
     int _initialX;
@@ -18,16 +24,12 @@ class Ball : public GameObject {
     }
 
     void update(float delta) {
-        _x += _vx * delta;
-        _y += _vy * delta;
+        _x += _velociRAPTOR * _vx * delta;
+        _y += _velociRAPTOR * _vy * delta;
 
-        if (_vx < 0) {
-            _vx -= 2 * delta;
-        } else {
-            _vx += 2 * delta;
-        }
+        _velociRAPTOR += 2 * delta;
 
-        _vx = constrain(_vx, -80, 80);
+        _velociRAPTOR = constrain(_velociRAPTOR, -80, 80);
 
         if (_y <= 0 && _vy < 0) {
             _y = 0;
@@ -46,23 +48,33 @@ class Ball : public GameObject {
 
     void turnRight(float ratio) {
         if (_vx < 0) {
-            _vx = -_vx;
-            _vy = _vy * 0.4 + 60 * ratio * 0.6;
+            float currentAngle = atan2(_vy, _vx) * RAD_TO_DEG;
+            float schwuggel = currentAngle >= 90 ? 180 - currentAngle : -180 - currentAngle;
+            float rad =
+                (schwuggel * ENTRY_ANGLE_FACTOR + BAR_MANIPULATOR_MAX_ANGLE * ratio * BAR_MANIPULATOR) * DEG_TO_RAD;
+
+            _vx = cos(rad);
+            _vy = sin(rad);
         }
     }
 
     void turnLeft(float ratio) {
         if (_vx > 0) {
-            _vx = -_vx;
-            _vy = _vy * 0.4 + 60 * ratio * 0.6;
-            // _vy = 40 * ratio;
+            float currentAngle = atan2(_vy, _vx) * RAD_TO_DEG;
+            float rad =
+                -1 * (180 + (currentAngle * ENTRY_ANGLE_FACTOR + BAR_MANIPULATOR_MAX_ANGLE * ratio * BAR_MANIPULATOR)) *
+                DEG_TO_RAD;
+
+            _vx = cos(rad);
+            _vy = sin(rad);
         }
     }
 
     void reset() {
         _x = _initialX;
         _y = _initialY;
-        _vx = _vx < 0 ? -40 : 40;
+        _velociRAPTOR = 40;
+        _vx = _vx < 0 ? -1 : 1;
         _vy = 0;
     }
 };
